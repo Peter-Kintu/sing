@@ -2,23 +2,32 @@ import requests
 from .models import SongRequest
 
 # --- External API Endpoints (Replace with actual keys and secure storage) ---
-DIFFRHYTHM_SIMULATED_AUDIO_URL = "https://example.com/dummy-diffrhythm-audio.mp3"  # Replace with real API when available
-KAIBER_VIDEO_API_URL = "https://kaiber.ai/api/video"  # Simulated endpoint
-# API_KEY_HEADER = {"Authorization": "Bearer YOUR_SECRET_KEY"}  # Use environment variables!
+DIFFRHYTHM_API_URL = "https://diffrhythm.app/api/generate"  # Replace with real endpoint
+KAIBER_VIDEO_API_URL = "https://kaiber.ai/api/video"        # Replace with real endpoint
+API_KEY_HEADER = {"Authorization": "Bearer YOUR_SECRET_KEY"}  # Use environment variables!
 
 # --- Utility Functions ---
 
-def call_diffrhythm_simulated(lyrics: str, genre: str, language: str = 'English'):
-    """Simulate DiffRhythm API to generate audio from lyrics."""
+def call_diffrhythm(lyrics: str, genre: str, language: str = 'English'):
+    """Call DiffRhythm API to generate audio from lyrics."""
     try:
-        print(f"🎶 Simulating DiffRhythm for genre={genre}, language={language}")
-        return DIFFRHYTHM_SIMULATED_AUDIO_URL
-    except Exception as e:
-        print(f"❌ DiffRhythm simulation failed: {e}")
+        print(f"🎶 Calling DiffRhythm for genre={genre}, language={language}")
+        response = requests.post(
+            DIFFRHYTHM_API_URL,
+            json={"lyrics": lyrics, "genre": genre, "language": language},
+            headers=API_KEY_HEADER,
+            timeout=180
+        )
+        response.raise_for_status()
+        audio_url = response.json().get("audio_url")
+        print(f"✅ DiffRhythm returned audio_url: {audio_url}")
+        return audio_url
+    except requests.RequestException as e:
+        print(f"❌ DiffRhythm API call failed: {e}")
         return None
 
 def call_kaiber_video(audio_url: str, lyrics: str, title: str = None):
-    """Simulate Kaiber AI to generate video from audio."""
+    """Call Kaiber AI to generate video from audio."""
     try:
         print(f"🎬 Calling Kaiber AI for audio_url: {audio_url}")
         payload = {"audio_url": audio_url, "lyrics": lyrics}
@@ -28,7 +37,7 @@ def call_kaiber_video(audio_url: str, lyrics: str, title: str = None):
         response = requests.post(
             KAIBER_VIDEO_API_URL,
             json=payload,
-            # headers=API_KEY_HEADER,
+            headers=API_KEY_HEADER,
             timeout=300
         )
         response.raise_for_status()
@@ -48,7 +57,7 @@ def generate_audio_task(song_request_id: int, lyrics: str, genre: str):
         song_request = SongRequest.objects.get(pk=song_request_id)
         print(f"🔍 Found SongRequest: {song_request.title}")
 
-        audio_url = call_diffrhythm_simulated(lyrics, genre, song_request.language)
+        audio_url = call_diffrhythm(lyrics, genre, song_request.language)
 
         if audio_url:
             song_request.audio_url = audio_url
