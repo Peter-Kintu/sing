@@ -6,10 +6,14 @@ DIFFRHYTHM_API_URL = "https://diffrhythm.app/api/generate"  # Replace with real 
 KAIBER_VIDEO_API_URL = "https://kaiber.ai/api/video"        # Replace with real endpoint
 API_KEY_HEADER = {"Authorization": "Bearer YOUR_SECRET_KEY"}  # Use environment variables!
 
+# --- Fallback URLs ---
+SIMULATED_AUDIO_URL = "https://example.com/dummy-diffrhythm-audio.mp3"
+SIMULATED_VIDEO_URL = "https://example.com/dummy-kaiber-video.mp4"
+
 # --- Utility Functions ---
 
 def call_diffrhythm(lyrics: str, genre: str, language: str = 'English'):
-    """Call DiffRhythm API to generate audio from lyrics."""
+    """Call DiffRhythm API to generate audio from lyrics, with fallback."""
     try:
         print(f"🎶 Calling DiffRhythm for genre={genre}, language={language}")
         response = requests.post(
@@ -24,10 +28,11 @@ def call_diffrhythm(lyrics: str, genre: str, language: str = 'English'):
         return audio_url
     except requests.RequestException as e:
         print(f"❌ DiffRhythm API call failed: {e}")
-        return None
+        print("⚠️ Falling back to simulated audio.")
+        return SIMULATED_AUDIO_URL
 
 def call_kaiber_video(audio_url: str, lyrics: str, title: str = None):
-    """Call Kaiber AI to generate video from audio."""
+    """Call Kaiber AI to generate video from audio, with fallback."""
     try:
         print(f"🎬 Calling Kaiber AI for audio_url: {audio_url}")
         payload = {"audio_url": audio_url, "lyrics": lyrics}
@@ -46,7 +51,8 @@ def call_kaiber_video(audio_url: str, lyrics: str, title: str = None):
         return video_url
     except requests.RequestException as e:
         print(f"❌ Kaiber AI API call failed: {e}")
-        return None
+        print("⚠️ Falling back to simulated video.")
+        return SIMULATED_VIDEO_URL
 
 # --- Synchronous Task Functions ---
 
