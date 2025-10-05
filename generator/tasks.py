@@ -20,11 +20,11 @@ def call_diffrhythm(lyrics: str, genre: str, language: str = 'English'):
         print(f"🎶 Calling DiffRhythm via PiAPI for genre={genre}, language={language}")
         payload = {
             "model": "Qubico/diffrhythm",
-            "task_type": "txt2audio-full",  # Use full-length generation
+            "task_type": "txt2audio-full",
             "input": {
-                "lyrics": lyrics
-            },
-            "style_prompt": f"{genre} in {language}"
+                "lyrics": lyrics,
+                "style_prompt": f"{genre} in {language}"
+            }
         }
         print("📦 Payload:", payload)
 
@@ -47,11 +47,11 @@ def call_diffrhythm(lyrics: str, genre: str, language: str = 'English'):
         trimmed = "\n".join(lyrics.splitlines()[:6])  # First 6 lines only
         retry_payload = {
             "model": "Qubico/diffrhythm",
-            "task_type": "txt2audio-base",  # Shorter fallback
+            "task_type": "txt2audio-base",
             "input": {
-                "lyrics": trimmed
-            },
-            "style_prompt": f"uplifting {genre}"
+                "lyrics": trimmed,
+                "style_prompt": f"uplifting {genre}"
+            }
         }
         print("📦 Retry Payload:", retry_payload)
 
