@@ -11,3 +11,4 @@ boto3
 django-environ
 # Optional: For future-proofing and video processing sync (Phase 3)
 ffmpeg-python
+gunicorn
