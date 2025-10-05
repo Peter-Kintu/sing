@@ -109,90 +109,93 @@ MESSAGE_TAGS = {
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # ==============================================================================
-# --- Jazzmin Customization (Enhanced Design) ---
+# --- Jazzmin Customization (Premium Materia Design) ---
 # ==============================================================================
 
 JAZZMIN_SETTINGS = {
     # TITLE AND BRANDING
-    "site_title": "Sing Admin Portal",
-    "site_header": "Sing | Generator Dashboard",
-    "site_brand": "Sing Generator",
-    "site_logo": "fas fa-headphones-alt", # Audio-themed logo icon
-    "site_icon": "fas fa-music",
-    "welcome_sign": "Welcome, Admin. Let's create something new.",
+    "site_title": "Sing | Admin",
+    "site_header": "Sing Generator",
+    "site_brand": "S-Gen", # Use a short version for small spaces
+    "brand_small_text": "S-Gen",
+    "site_logo": "fas fa-cogs", # Control/Configuration icon
+    "site_icon": "fas fa-cogs",
+    "welcome_sign": "Welcome back, Operator.", # More professional welcome
     "copyright": "KINTU Peter (Sing Project)",
-    "user_avatar": None, # Defaults to initial or image if available
+    "user_avatar": None, 
 
     # UI THEME AND STYLE
     "show_sidebar": True,
     "navigation_expanded": True,
-    # Prioritize 'generator' and 'auth' apps at the top of the sidebar
-    "order_with_respect_to": ["generator", "auth"], 
-    "search_model": ["auth.user", "generator.remix"], # Enable search
-
-    # TOPBAR LINKS (e.g., Quick access to main site/docs)
+    # Prioritize core logic apps at the top
+    "order_with_respect_to": ["generator", "auth", "rest_framework"], 
+    "search_model": ["auth.user", "generator.remix"], 
+    
+    # TOPBAR LINKS (for quick access)
     "top_menu_links": [
-        {"name": "Home", "url": "admin:index", "permissions": ["auth.view_user"]},
-        {"name": "App Frontend", "url": "/", "icon": "fas fa-bolt"},
-        {"model": "generator.remix"}, # Quick link to the Remix model (assuming you have one)
+        {"name": "Dashboard", "url": "admin:index"},
+        {"name": "App Frontend", "url": "/", "icon": "fas fa-external-link-alt"}, 
+        {"model": "generator.remix"}, # Direct link to a model
     ],
     
     # SIDEBAR LINKS
     "custom_links": {
         "generator": [{
-            "name": "Run New Remix Generation",
-            # Assuming you might want to link to an action page or the change list
+            "name": "Quick Generation Start",
             "url": "/admin/generator/remix/add/",
-            "icon": "fas fa-terminal",
-            "permissions": ["generator.add_remix"] # Placeholder permission
+            "icon": "fas fa-plug", # Icon representing initiating a process
+            "permissions": ["generator.add_remix"] 
         }]
     },
     
-    # ICONS
+    # ICONS (Less busy, more functional icons)
     "icons": {
         "auth": "fas fa-users-cog",
         "auth.user": "fas fa-user",
         "auth.group": "fas fa-users",
-        "generator": "fas fa-bolt", # App icon
-        "generator.remix": "fas fa-compact-disc", # Specific icon for a Remix model
-        # Add other app/model icons as needed
+        "generator": "fas fa-rocket", # Representing the core action/engine
+        "generator.remix": "fas fa-list-alt", # List of generated items
+        "rest_framework": "fas fa-database", # Representing API endpoints/data access
     },
     
-    # OTHER UI TWEAKS
-    "default_icon_parents": "fas fa-folder-open",
-    "default_icon_children": "fas fa-arrow-circle-right",
+    # OTHER UI TWEAKS (Hierarchy and structure)
+    "default_icon_parents": "fas fa-chevron-right", # Clear separator
+    "default_icon_children": "fas fa-minus", # Simple list item marker
     
-    # THEME SELECTION (Solar is a clean, dark theme)
-    "theme": "solar", 
-    "dark_mode_theme": "darkly", # A secondary dark theme for the toggle switch
+    # THEME SELECTION (Materia is clean, flat, and professional)
+    "theme": "materia", 
+    "dark_mode_theme": "darkly", 
     "site_brand_css": "font-weight-bold text-lg",
     "actions_sticky_top": True,
-    "show_ui_builder": False, # Always set to False in production
+    "show_ui_builder": False, 
 }
 
 # Optional: Add UI Tweaks for even better look and feel
 JAZZMIN_UI_TWEAKS = {
-    # Navbar: Light and prominent
-    "navbar": "navbar-white navbar-light", 
+    # Navbar: Dark for high contrast against Materia's white body
+    "navbar": "navbar-dark navbar-primary", 
     
-    # Sidebar: Dark and fixed for better navigation
-    "sidebar": "sidebar-dark-info", 
+    # Sidebar: Dark and fixed for better navigation and prominence
+    "sidebar": "sidebar-dark-primary", # Use the primary color's dark variant for contrast
     "sidebar_fixed": True,
     "sidebar_nav_flat_style": True,
-
+    "sidebar_nav_child_indent": True, # Adds a nice visual hierarchy
+    "sidebar_nav_compact_style": True, # Reduces spacing for more menu items
+    "sidebar_user_panel": True, # Displays user's name/status prominently
+    
     # Footer: Small text
     "footer_small": True,
     
     # Button Style
     "button_classes": {
-        "primary": "btn-outline-primary",
+        "primary": "btn-outline-primary", # Uses theme primary color for actions
         "secondary": "btn-outline-secondary",
         "info": "btn-info",
         "warning": "btn-warning",
         "danger": "btn-danger",
         "success": "btn-success"
     },
-    "theme": "solar",
+    "theme": "materia",
     "dark_mode_theme": "darkly",
     "actions_sticky_top": True
 }
