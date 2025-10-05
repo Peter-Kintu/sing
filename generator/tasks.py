@@ -18,14 +18,19 @@ def call_diffrhythm(lyrics: str, genre: str, language: str = 'English'):
     """Call PiAPI DiffRhythm to generate audio from lyrics, with fallback."""
     try:
         print(f"🎶 Calling DiffRhythm via PiAPI for genre={genre}, language={language}")
+        payload = {
+            "model": "Qubico/diffrhythm",
+            "task_type": "txt2audio-base",
+            "input": {
+                "lyrics": lyrics
+            },
+            "style_prompt": f"{genre} in {language}"
+        }
+        print("📦 Payload:", payload)
+
         response = requests.post(
             DIFFRHYTHM_API_URL,
-            json={
-                "model": "diffrhythm",
-                "task_type": "txt2audio-base",
-                "input": lyrics,
-                "style_prompt": f"{genre} in {language}"
-            },
+            json=payload,
             headers=API_KEY_HEADER,
             timeout=180
         )
