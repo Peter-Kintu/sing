@@ -30,7 +30,7 @@ GENRE_CHOICES = [
 STATUS_CHOICES = [
     ('PENDING', 'Pending Generation'),
     ('AUDIO_READY', 'Audio Generated'),
-    ('VIDEO_READY', 'Video Generated'),
+    # ('VIDEO_READY', 'Video Generated'),  # Temporarily disabled
     ('FAILED', 'Generation Failed'),
 ]
 
@@ -68,8 +68,8 @@ class SongRequest(models.Model):
     # --- Output/Media Fields ---
     audio_url = models.URLField(max_length=500, blank=True, null=True,
                                 help_text="S3/Firebase URL for the generated audio file.")
-    video_url = models.URLField(max_length=500, blank=True, null=True,
-                                help_text="URL for the generated music video.")
+    # video_url = models.URLField(max_length=500, blank=True, null=True,
+    #                             help_text="URL for the generated music video.")  # Temporarily disabled
     duration = models.PositiveIntegerField(blank=True, null=True,
                                            help_text="Duration of the generated audio in seconds.")
 

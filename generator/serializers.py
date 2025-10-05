@@ -19,7 +19,7 @@ class SongRequestSerializer(serializers.ModelSerializer):
             'language',
             'status',
             'audio_url',
-            'video_url',
+            # 'video_url',  # Temporarily disabled for audio-only phase
             'duration',
             'remix_of',
             'remix_count',
@@ -30,7 +30,7 @@ class SongRequestSerializer(serializers.ModelSerializer):
         read_only_fields = (
             'status',
             'audio_url',
-            'video_url',
+            # 'video_url',  # Temporarily disabled for audio-only phase
             'duration',
             'remix_count',
             'created_at',

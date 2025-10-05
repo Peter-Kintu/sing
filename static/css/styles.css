@@ -1,5 +1,5 @@
-/* 
- * This file is a placeholder to stop the 404 console error 
+/*
+ * This file is a placeholder to stop the 404 console error
  * and can be used for custom styling outside of Bootstrap.
  */
 
@@ -44,9 +44,8 @@ body {
     border-radius: 8px;
 }
 
-/* Audio and video players */
-#audio-player,
-#video-player {
+/* Audio player */
+#audio-player {
     margin-top: 1rem;
 }
 

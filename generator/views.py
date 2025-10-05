@@ -87,7 +87,7 @@ class GenerateSongView(LoginRequiredMixin, generics.CreateAPIView):
 
 class SongStatusView(LoginRequiredMixin, generics.RetrieveAPIView):
     """
-    Handles GET request to retrieve current status, audio, and video URLs.
+    Handles GET request to retrieve current status and audio URL.
     Used for frontend polling.
     """
     queryset = SongRequest.objects.all()
@@ -102,7 +102,7 @@ def public_gallery_view(request):
     """
     Displays publicly shared songs for remixing or inspiration.
     """
-    songs = SongRequest.objects.filter(is_public=True, status='VIDEO_READY')
+    songs = SongRequest.objects.filter(is_public=True, status='AUDIO_READY')
     return render(request, 'generator/gallery.html', {'songs': songs})
 
 # --- Remix Endpoint ---

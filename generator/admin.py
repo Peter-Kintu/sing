@@ -19,7 +19,7 @@ class SongRequestAdmin(admin.ModelAdmin):
     # Fields that should not be editable
     readonly_fields = [
         'audio_url',
-        'video_url',
+        # 'video_url',  # Temporarily disabled for audio-only phase
         'remix_count',
         'duration',
         'created_at',

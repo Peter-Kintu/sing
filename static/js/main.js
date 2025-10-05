@@ -20,8 +20,6 @@ const progressBar = document.getElementById('progress-bar');
 const progressMessage = document.getElementById('progress-message');
 
 const audioPlayer = document.getElementById('audio-player');
-const videoPlayer = document.getElementById('video-player');
-const videoPlayerContainer = document.getElementById('video-player-container');
 const downloadLink = document.getElementById('download-link');
 const remixButton = document.getElementById('remix-button');
 const currentStatusSpan = document.getElementById('current-status');
@@ -99,8 +97,7 @@ async function handleSubmit(e) {
 function startPolling(requestId) {
     const steps = [
         { status: 'PENDING', progress: 10, message: 'Received request. Starting generation...' },
-        { status: 'AUDIO_READY', progress: 60, message: 'Audio generated! Preparing video...' },
-        { status: 'VIDEO_READY', progress: 100, message: 'Complete! Your Global Anthem is ready!' },
+        { status: 'AUDIO_READY', progress: 100, message: '✅ Audio generated! Your anthem is ready!' },
         { status: 'FAILED', progress: 100, message: 'Generation failed. Please try again.' }
     ];
 
@@ -121,16 +118,12 @@ function startPolling(requestId) {
                 currentStatusSpan.textContent = status;
             }
 
-            if (status === 'VIDEO_READY') {
+            if (status === 'AUDIO_READY' && data.audio_url) {
                 clearInterval(pollingInterval);
                 displayResults(data);
             } else if (status === 'FAILED') {
                 clearInterval(pollingInterval);
                 displayFailure();
-            } else if (status === 'AUDIO_READY' && data.audio_url) {
-                audioPlayer.src = data.audio_url;
-                audioPlayer.style.display = 'block';
-                currentStatusSpan.textContent = "Audio Ready! Generating Video...";
             }
 
         } catch (error) {
@@ -153,18 +146,10 @@ function displayResults(data) {
     audioPlayer.src = data.audio_url;
     audioPlayer.style.display = 'block';
 
-    if (data.video_url) {
-        videoPlayer.src = data.video_url;
-        videoPlayerContainer.style.display = 'block';
-    }
-
-    downloadLink.href = data.audio_url || data.video_url;
-
-    if (data.video_url) {
-        remixButton.style.display = 'inline-block';
-        currentStatusSpan.textContent = "Completed";
-        progressBar.style.backgroundColor = 'green';
-    }
+    downloadLink.href = data.audio_url;
+    remixButton.style.display = 'inline-block';
+    currentStatusSpan.textContent = "Completed";
+    progressBar.style.backgroundColor = 'green';
 }
 
 function displayFailure() {
