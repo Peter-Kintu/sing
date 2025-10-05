@@ -52,6 +52,12 @@ function getCookie(name) {
 async function handleSubmit(e) {
     e.preventDefault();
 
+    const lyrics = lyricsInput.value.trim();
+    if (!lyrics || lyrics.length < 10) {
+        alert("Lyrics must be at least 10 characters.");
+        return;
+    }
+
     inputStage.style.display = 'none';
     processingStage.style.display = 'block';
 
@@ -59,14 +65,16 @@ async function handleSubmit(e) {
 
     const data = {
         title: titleInput?.value || null,
-        lyrics: lyricsInput.value,
-        genre: genreSelect.value,
-        mood: moodSelect.value,
-        language: languageSelect?.value || 'English',
-        voice_type: voiceTypeSelect?.value || null,
+        lyrics: lyrics,
+        genre: genreSelect.value.toLowerCase(),
+        mood: moodSelect.value.toLowerCase(),
+        language: languageSelect?.value.charAt(0).toUpperCase() + languageSelect.value.slice(1),
+        voice_type: voiceTypeSelect?.value?.toLowerCase() || null,
         is_public: publicCheckbox?.checked || false,
         remix_of: remixSourceId || null
     };
+
+    console.log("📦 Submitting payload:", data);
 
     try {
         const response = await fetch(`${BASE_API_URL}/generate-song/`, {
@@ -79,11 +87,19 @@ async function handleSubmit(e) {
         });
 
         if (!response.ok) {
-            throw new Error(`API submission failed with status ${response.status}`);
+            const errorDetails = await response.json();
+            console.error("❌ Backend validation errors:", errorDetails);
+            progressMessage.textContent = `Error: ${JSON.stringify(errorDetails)}.`;
+            progressBar.style.backgroundColor = 'red';
+            setTimeout(() => {
+                processingStage.style.display = 'none';
+                inputStage.style.display = 'block';
+            }, 5000);
+            return;
         }
 
         const songRequest = await response.json();
-        console.log("Song request submitted. ID:", songRequest.id);
+        console.log("✅ Song request submitted. ID:", songRequest.id);
 
         startPolling(songRequest.id);
 
