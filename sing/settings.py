@@ -108,28 +108,91 @@ MESSAGE_TAGS = {
 # --- Default Primary Key ---
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# --- Jazzmin Customization ---
+# ==============================================================================
+# --- Jazzmin Customization (Enhanced Design) ---
+# ==============================================================================
+
 JAZZMIN_SETTINGS = {
-    "site_title": "Sing Admin",
-    "site_header": "Sing Dashboard",
-    "site_brand": "Sing",
-    "welcome_sign": "Welcome to Sing Admin",
-    "copyright": "KINTU Peter",
+    # TITLE AND BRANDING
+    "site_title": "Sing Admin Portal",
+    "site_header": "Sing | Generator Dashboard",
+    "site_brand": "Sing Generator",
+    "site_logo": "fas fa-headphones-alt", # Audio-themed logo icon
+    "site_icon": "fas fa-music",
+    "welcome_sign": "Welcome, Admin. Let's create something new.",
+    "copyright": "KINTU Peter (Sing Project)",
+    "user_avatar": None, # Defaults to initial or image if available
+
+    # UI THEME AND STYLE
     "show_sidebar": True,
     "navigation_expanded": True,
-    "order_with_respect_to": ["generator"],
+    # Prioritize 'generator' and 'auth' apps at the top of the sidebar
+    "order_with_respect_to": ["generator", "auth"], 
+    "search_model": ["auth.user", "generator.remix"], # Enable search
+
+    # TOPBAR LINKS (e.g., Quick access to main site/docs)
+    "top_menu_links": [
+        {"name": "Home", "url": "admin:index", "permissions": ["auth.view_user"]},
+        {"name": "App Frontend", "url": "/", "icon": "fas fa-bolt"},
+        {"model": "generator.remix"}, # Quick link to the Remix model (assuming you have one)
+    ],
+    
+    # SIDEBAR LINKS
     "custom_links": {
         "generator": [{
-            "name": "Remix Generator",
-            "url": "/admin/generator/",
-            "icon": "fas fa-magic",
-            "permissions": ["generator.view_generator"]
+            "name": "Run New Remix Generation",
+            # Assuming you might want to link to an action page or the change list
+            "url": "/admin/generator/remix/add/",
+            "icon": "fas fa-terminal",
+            "permissions": ["generator.add_remix"] # Placeholder permission
         }]
     },
+    
+    # ICONS
     "icons": {
         "auth": "fas fa-users-cog",
-        "generator": "fas fa-bolt",
+        "auth.user": "fas fa-user",
+        "auth.group": "fas fa-users",
+        "generator": "fas fa-bolt", # App icon
+        "generator.remix": "fas fa-compact-disc", # Specific icon for a Remix model
+        # Add other app/model icons as needed
     },
-    "default_icon_parents": "fas fa-chevron-circle-right",
-    "default_icon_children": "fas fa-circle",
+    
+    # OTHER UI TWEAKS
+    "default_icon_parents": "fas fa-folder-open",
+    "default_icon_children": "fas fa-arrow-circle-right",
+    
+    # THEME SELECTION (Solar is a clean, dark theme)
+    "theme": "solar", 
+    "dark_mode_theme": "darkly", # A secondary dark theme for the toggle switch
+    "site_brand_css": "font-weight-bold text-lg",
+    "actions_sticky_top": True,
+    "show_ui_builder": False, # Always set to False in production
+}
+
+# Optional: Add UI Tweaks for even better look and feel
+JAZZMIN_UI_TWEAKS = {
+    # Navbar: Light and prominent
+    "navbar": "navbar-white navbar-light", 
+    
+    # Sidebar: Dark and fixed for better navigation
+    "sidebar": "sidebar-dark-info", 
+    "sidebar_fixed": True,
+    "sidebar_nav_flat_style": True,
+
+    # Footer: Small text
+    "footer_small": True,
+    
+    # Button Style
+    "button_classes": {
+        "primary": "btn-outline-primary",
+        "secondary": "btn-outline-secondary",
+        "info": "btn-info",
+        "warning": "btn-warning",
+        "danger": "btn-danger",
+        "success": "btn-success"
+    },
+    "theme": "solar",
+    "dark_mode_theme": "darkly",
+    "actions_sticky_top": True
 }
