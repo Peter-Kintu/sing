@@ -15,7 +15,7 @@ SIMULATED_AUDIO_URL = "https://example.com/dummy-diffrhythm-audio.mp3"
 # --- Utility Functions ---
 
 def call_diffrhythm(lyrics: str, genre: str, language: str = 'English'):
-    """Call PiAPI DiffRhythm to generate audio from lyrics, with fallback."""
+    """Call PiAPI DiffRhythm to generate audio from lyrics, with fallback and retry."""
     try:
         print(f"🎶 Calling DiffRhythm via PiAPI for genre={genre}, language={language}")
         payload = {
@@ -35,9 +35,39 @@ def call_diffrhythm(lyrics: str, genre: str, language: str = 'English'):
             timeout=180
         )
         response.raise_for_status()
-        audio_url = response.json().get("audio_url")
-        print(f"✅ PiAPI returned audio_url: {audio_url}")
-        return audio_url if audio_url and audio_url.startswith("http") else SIMULATED_AUDIO_URL
+        result = response.json()
+        print("🔍 Full PiAPI response:", result)
+
+        audio_url = result.get("audio_url")
+        if audio_url and audio_url.startswith("http"):
+            print(f"✅ PiAPI returned audio_url: {audio_url}")
+            return audio_url
+
+        print("⚠️ No audio_url returned. Retrying with trimmed lyrics...")
+        trimmed = "\n".join(lyrics.splitlines()[:6])  # First 6 lines only
+        retry_payload = {
+            "model": "Qubico/diffrhythm",
+            "task_type": "txt2audio-base",
+            "input": {
+                "lyrics": trimmed
+            },
+            "style_prompt": f"{genre} in {language}"
+        }
+        print("📦 Retry Payload:", retry_payload)
+
+        retry_response = requests.post(
+            DIFFRHYTHM_API_URL,
+            json=retry_payload,
+            headers=API_KEY_HEADER,
+            timeout=180
+        )
+        retry_response.raise_for_status()
+        retry_result = retry_response.json()
+        print("🔁 Retry PiAPI response:", retry_result)
+
+        retry_audio_url = retry_result.get("audio_url")
+        return retry_audio_url if retry_audio_url and retry_audio_url.startswith("http") else SIMULATED_AUDIO_URL
+
     except requests.RequestException as e:
         print(f"❌ PiAPI DiffRhythm call failed: {e}")
         print("⚠️ Falling back to simulated audio.")
