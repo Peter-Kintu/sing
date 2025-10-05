@@ -79,7 +79,10 @@ class SongRequestSerializer(serializers.ModelSerializer):
 
     def validate_mood(self, value):
         value = value.lower()
-        allowed_moods = ['joy', 'resilience', 'love', 'worship', 'hope']
+        allowed_moods = [
+            'joy', 'resilience', 'love', 'worship', 'hope',
+            'celebratory', 'harvest', 'protest', 'reflection'
+        ]
         if value not in allowed_moods:
             raise serializers.ValidationError(f"Mood '{value}' is not supported.")
         return value
