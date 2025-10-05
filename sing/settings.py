@@ -7,7 +7,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-l0#htld0u5#saj+op)_+y4w^r#w9sf54-t6)^$-*&13h-_h3o&'
 DEBUG = True
 ALLOWED_HOSTS = [
-    'https://sing-sjf2.onrender.com',
+    'localhost',
+    '127.0.0.1',
+    'sing-sjf2.onrender.com',
+    
 ]
 
 # --- Installed Apps ---
