@@ -9,6 +9,14 @@ class SongRequestSerializer(serializers.ModelSerializer):
 
     style_prompt = serializers.SerializerMethodField()
 
+    title = serializers.CharField(required=False, allow_blank=True)
+    voice_type = serializers.CharField(required=False, allow_null=True)
+    remix_of = serializers.PrimaryKeyRelatedField(
+        queryset=SongRequest.objects.all(),
+        required=False,
+        allow_null=True
+    )
+
     class Meta:
         model = SongRequest
         fields = (
@@ -70,7 +78,8 @@ class SongRequestSerializer(serializers.ModelSerializer):
         return value
 
     def validate_mood(self, value):
+        value = value.lower()
         allowed_moods = ['joy', 'resilience', 'love', 'worship', 'hope']
-        if value and value.lower() not in allowed_moods:
+        if value not in allowed_moods:
             raise serializers.ValidationError(f"Mood '{value}' is not supported.")
         return value

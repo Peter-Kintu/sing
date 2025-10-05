@@ -62,8 +62,12 @@ class GenerateSongView(LoginRequiredMixin, generics.CreateAPIView):
     serializer_class = SongRequestSerializer
 
     def create(self, request, *args, **kwargs):
+        print("🔍 Incoming request data:", request.data)
+
         serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+        if not serializer.is_valid():
+            print("❌ Validation errors:", serializer.errors)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         song_request = serializer.save(user=self.request.user, status='PENDING')
 
@@ -73,7 +77,8 @@ class GenerateSongView(LoginRequiredMixin, generics.CreateAPIView):
                 song_request_id=song_request.id,
                 lyrics=song_request.lyrics,
                 genre=song_request.genre,
-                language=song_request.language
+                language=song_request.language,
+                voice_type=song_request.voice_type
             )
         except Exception as e:
             print(f"❌ Audio task execution failed: {e}")
@@ -124,8 +129,11 @@ class RemixSongView(LoginRequiredMixin, generics.CreateAPIView):
                 'error': f"Original song with ID {original_id} not found."
             }, status=status.HTTP_404_NOT_FOUND)
 
+        print("🔍 Remix request data:", request.data)
         serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+        if not serializer.is_valid():
+            print("❌ Remix validation errors:", serializer.errors)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         remix = serializer.save(
             user=request.user,
@@ -139,7 +147,8 @@ class RemixSongView(LoginRequiredMixin, generics.CreateAPIView):
                 song_request_id=remix.id,
                 lyrics=remix.lyrics,
                 genre=remix.genre,
-                language=remix.language
+                language=remix.language,
+                voice_type=remix.voice_type
             )
         except Exception as e:
             print(f"❌ Remix task execution failed: {e}")
