@@ -16,6 +16,7 @@ ALLOWED_HOSTS = [
 
 # --- Installed Apps ---
 INSTALLED_APPS = [
+    'jazzmin',  # Jasmin-inspired admin theme
     'rest_framework',
     'generator',
     'django.contrib.admin',
@@ -106,3 +107,29 @@ MESSAGE_TAGS = {
 
 # --- Default Primary Key ---
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# --- Jazzmin Customization ---
+JAZZMIN_SETTINGS = {
+    "site_title": "Sing Admin",
+    "site_header": "Sing Dashboard",
+    "site_brand": "Sing",
+    "welcome_sign": "Welcome to Sing Admin",
+    "copyright": "KINTU Peter",
+    "show_sidebar": True,
+    "navigation_expanded": True,
+    "order_with_respect_to": ["generator"],
+    "custom_links": {
+        "generator": [{
+            "name": "Remix Generator",
+            "url": "/admin/generator/",
+            "icon": "fas fa-magic",
+            "permissions": ["generator.view_generator"]
+        }]
+    },
+    "icons": {
+        "auth": "fas fa-users-cog",
+        "generator": "fas fa-bolt",
+    },
+    "default_icon_parents": "fas fa-chevron-circle-right",
+    "default_icon_children": "fas fa-circle",
+}
