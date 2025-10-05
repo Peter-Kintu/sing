@@ -1,10 +1,11 @@
+import os
 import requests
 from .models import SongRequest
 
 # --- External API Endpoints ---
-DIFFRHYTHM_API_URL = "https://api.piapi.ai/api/v1/task"  # ✅ Updated to PiAPI endpoint
+DIFFRHYTHM_API_URL = "https://api.piapi.ai/api/v1/task"
 API_KEY_HEADER = {
-    "x-api-key": "YOUR_PIAPI_KEY",  # 🔐 Replace with your actual PiAPI key
+    "x-api-key": os.getenv("PIAPI_KEY", "a2bf48b5841cbf27da592eac0f85a85d2bfaa6af10c0cd56e74a0454fad4b053"),
     "Content-Type": "application/json"
 }
 
@@ -21,7 +22,7 @@ def call_diffrhythm(lyrics: str, genre: str, language: str = 'English'):
             DIFFRHYTHM_API_URL,
             json={
                 "model": "diffrhythm",
-                "task_type": "txt2audio-base",  # You can switch to txt2audio-full if needed
+                "task_type": "txt2audio-base",
                 "input": lyrics,
                 "style_prompt": f"{genre} in {language}"
             },
