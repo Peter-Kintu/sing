@@ -3,10 +3,6 @@ Django>=5.2,<6.0
 djangorestframework
 requests
 
-# Asynchronous task handling
-celery>=5.2
-redis>=4.0  # Or use RabbitMQ if preferred
-
 # Media storage (S3/Firebase integration)
 django-storages>=1.14
 boto3>=1.40
@@ -23,7 +19,7 @@ gunicorn>=20.0
 whitenoise>=6.6.0  # For static file serving on Render
 
 # Optional: Video processing (Phase 3)
-ffmpeg-python>=0.2
+ffmpeg-python>=0.2  # Only needed if doing local video rendering
 
 # Admin UI customization
 django-jazzmin>=2.6.0
