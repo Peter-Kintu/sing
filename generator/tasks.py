@@ -14,17 +14,21 @@ SIMULATED_AUDIO_URL = "https://example.com/dummy-diffrhythm-audio.mp3"
 
 # --- Utility Functions ---
 
-def call_diffrhythm(lyrics: str, genre: str, language: str = 'English'):
+def call_diffrhythm(lyrics: str, genre: str, language: str = 'English', voice_type: str = None):
     """Call PiAPI DiffRhythm to generate audio from lyrics, with fallback and retry."""
     try:
         print(f"🎶 Calling DiffRhythm via PiAPI for genre={genre}, language={language}")
+        input_block = {
+            "lyrics": lyrics,
+            "style_prompt": f"{genre} in {language}"
+        }
+        if voice_type:
+            input_block["voice_type"] = voice_type
+
         payload = {
             "model": "Qubico/diffrhythm",
             "task_type": "txt2audio-full",
-            "input": {
-                "lyrics": lyrics,
-                "style_prompt": f"{genre} in {language}"
-            }
+            "input": input_block
         }
         print("📦 Payload:", payload)
 
@@ -45,13 +49,17 @@ def call_diffrhythm(lyrics: str, genre: str, language: str = 'English'):
 
         print("⚠️ No audio_url returned. Retrying with trimmed lyrics and simplified style...")
         trimmed = "\n".join(lyrics.splitlines()[:6])  # First 6 lines only
+        retry_input = {
+            "lyrics": trimmed,
+            "style_prompt": f"uplifting {genre}"
+        }
+        if voice_type:
+            retry_input["voice_type"] = voice_type
+
         retry_payload = {
             "model": "Qubico/diffrhythm",
             "task_type": "txt2audio-base",
-            "input": {
-                "lyrics": trimmed,
-                "style_prompt": f"uplifting {genre}"
-            }
+            "input": retry_input
         }
         print("📦 Retry Payload:", retry_payload)
 
@@ -82,7 +90,15 @@ def generate_audio_task(song_request_id: int, lyrics: str, genre: str):
         song_request = SongRequest.objects.get(pk=song_request_id)
         print(f"🔍 Found SongRequest: {song_request.title}")
 
-        audio_url = call_diffrhythm(lyrics, genre, song_request.language)
+        if song_request.is_remix:
+            print(f"♻️ Remix of SongRequest ID {song_request.remix_of.id}")
+
+        audio_url = call_diffrhythm(
+            lyrics=lyrics,
+            genre=genre,
+            language=song_request.language,
+            voice_type=song_request.voice_type
+        )
 
         if audio_url:
             song_request.audio_url = audio_url
