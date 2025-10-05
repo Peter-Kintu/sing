@@ -68,7 +68,7 @@ class GenerateSongView(LoginRequiredMixin, generics.CreateAPIView):
         song_request = serializer.save(user=self.request.user, status='PENDING')
 
         try:
-            print(f"🎶 Executing audio task for SongRequest ID {song_request.id}")
+            print(f"🎶 User {request.user.username} submitted lyrics for generation.")
             generate_audio_task(
                 song_request_id=song_request.id,
                 lyrics=song_request.lyrics,
@@ -133,7 +133,7 @@ class RemixSongView(LoginRequiredMixin, generics.CreateAPIView):
         )
 
         try:
-            print(f"♻️ Executing remix audio task for SongRequest ID {remix.id}")
+            print(f"♻️ User {request.user.username} is remixing '{original_song.title}' (ID {original_id})")
             generate_audio_task(
                 song_request_id=remix.id,
                 lyrics=remix.lyrics,
@@ -146,5 +146,7 @@ class RemixSongView(LoginRequiredMixin, generics.CreateAPIView):
 
         return Response({
             'id': remix.id,
-            'message': 'Remix started. You can check status shortly.'
+            'remix_of': original_song.id,
+            'original_title': original_song.title,
+            'message': f'Remix of "{original_song.title}" started. You can check status shortly.'
         }, status=status.HTTP_201_CREATED)
