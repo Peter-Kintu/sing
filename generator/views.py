@@ -63,7 +63,6 @@ class GenerateSongView(LoginRequiredMixin, generics.CreateAPIView):
 
     def create(self, request, *args, **kwargs):
         print("🔍 Incoming request data:", request.data)
-        print("📦 Raw body:", request.body.decode('utf-8'))
 
         serializer = self.get_serializer(data=request.data)
         if not serializer.is_valid():
@@ -131,7 +130,6 @@ class RemixSongView(LoginRequiredMixin, generics.CreateAPIView):
             }, status=status.HTTP_404_NOT_FOUND)
 
         print("🔍 Remix request data:", request.data)
-        print("📦 Raw body:", request.body.decode('utf-8'))
 
         serializer = self.get_serializer(data=request.data)
         if not serializer.is_valid():
