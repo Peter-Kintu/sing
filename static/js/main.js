@@ -8,6 +8,7 @@ const genreSelect = document.getElementById('genre-select');
 const moodSelect = document.getElementById('mood-select');
 const titleInput = document.getElementById('title-input');
 const languageSelect = document.getElementById('language-select');
+const voiceTypeSelect = document.getElementById('voice-type-select');
 const publicCheckbox = document.getElementById('is-public-checkbox');
 
 const generateButton = document.getElementById('generate-button');
@@ -23,8 +24,11 @@ const audioPlayer = document.getElementById('audio-player');
 const downloadLink = document.getElementById('download-link');
 const remixButton = document.getElementById('remix-button');
 const currentStatusSpan = document.getElementById('current-status');
+const remixOrigin = document.getElementById('remix-origin');
+const remixSourceTitle = document.getElementById('remix-source-title');
 
 let pollingInterval;
+let remixSourceId = null; // Optional: set this if remixing
 
 // --- Utility Functions ---
 
@@ -59,7 +63,9 @@ async function handleSubmit(e) {
         genre: genreSelect.value,
         mood: moodSelect.value,
         language: languageSelect?.value || 'English',
-        is_public: publicCheckbox?.checked || false
+        voice_type: voiceTypeSelect?.value || null,
+        is_public: publicCheckbox?.checked || false,
+        remix_of: remixSourceId || null
     };
 
     try {
@@ -150,6 +156,11 @@ function displayResults(data) {
     remixButton.style.display = 'inline-block';
     currentStatusSpan.textContent = "Completed";
     progressBar.style.backgroundColor = 'green';
+
+    if (data.remix_of && data.original_title) {
+        remixOrigin.style.display = 'block';
+        remixSourceTitle.textContent = data.original_title;
+    }
 }
 
 function displayFailure() {

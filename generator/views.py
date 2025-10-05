@@ -72,7 +72,8 @@ class GenerateSongView(LoginRequiredMixin, generics.CreateAPIView):
             generate_audio_task(
                 song_request_id=song_request.id,
                 lyrics=song_request.lyrics,
-                genre=song_request.genre
+                genre=song_request.genre,
+                language=song_request.language
             )
         except Exception as e:
             print(f"❌ Audio task execution failed: {e}")
@@ -137,7 +138,8 @@ class RemixSongView(LoginRequiredMixin, generics.CreateAPIView):
             generate_audio_task(
                 song_request_id=remix.id,
                 lyrics=remix.lyrics,
-                genre=remix.genre
+                genre=remix.genre,
+                language=remix.language
             )
         except Exception as e:
             print(f"❌ Remix task execution failed: {e}")

@@ -108,5 +108,13 @@ class SongRequest(models.Model):
     def display_title(self):
         return self.title or f"{self.genre.title()} Anthem by {self.user.username}"
 
+    @property
+    def style_prompt(self):
+        return f"{self.genre} in {self.language}"
+
+    @property
+    def display_mood(self):
+        return dict(CULTURAL_THEMES).get(self.mood, self.mood.title())
+
     def get_absolute_url(self):
         return reverse('song-status', kwargs={'pk': self.pk})
