@@ -12,7 +12,6 @@ def call_diffrhythm_simulated(lyrics: str, genre: str, language: str = 'English'
     """Simulate DiffRhythm API to generate audio from lyrics."""
     try:
         print(f"🎶 Simulating DiffRhythm for genre={genre}, language={language}")
-        # Replace this with a real API call when available
         return DIFFRHYTHM_SIMULATED_AUDIO_URL
     except Exception as e:
         print(f"❌ DiffRhythm simulation failed: {e}")
@@ -57,9 +56,9 @@ def generate_audio_task(song_request_id: int, lyrics: str, genre: str):
             song_request.save(update_fields=['audio_url', 'status', 'updated_at'])
             print(f"✅ Audio saved for SongRequest {song_request_id}")
 
-            generate_video_task(song_request_id, audio_url, lyrics)
-            print(f"🎬 Video task executed for SongRequest {song_request_id}")
-            return f"Audio and video generated for request {song_request_id}."
+            video_result = generate_video_task(song_request_id, audio_url, lyrics)
+            print(f"🎬 Video task result: {video_result}")
+            return f"Audio and video processed for request {song_request_id}."
 
         else:
             song_request.status = 'FAILED'
@@ -91,7 +90,7 @@ def generate_video_task(song_request_id: int, audio_url: str, lyrics: str):
             return f"Video generated for request {song_request_id}."
 
         else:
-            song_request.status = 'AUDIO_READY'  # Optionally use 'VIDEO_FAILED'
+            song_request.status = 'VIDEO_FAILED'
             song_request.save(update_fields=['status'])
             print(f"❌ Video generation failed for SongRequest {song_request_id}")
             return f"Video generation failed for request {song_request_id}."
