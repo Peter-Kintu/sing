@@ -1,16 +1,17 @@
 from pathlib import Path
 from django.contrib.messages import constants as messages
+import dj_database_url
+import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # --- Security ---
-SECRET_KEY = 'django-insecure-l0#htld0u5#saj+op)_+y4w^r#w9sf54-t6)^$-*&13h-_h3o&'
-DEBUG = True
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-l0#htld0u5#saj+op)_+y4w^r#w9sf54-t6)^$-*&13h-_h3o&')
+DEBUG = os.getenv('DEBUG', 'True') == 'True'
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
     'sing-sjf2.onrender.com',
-    
 ]
 
 # --- Installed Apps ---
@@ -44,7 +45,7 @@ WSGI_APPLICATION = 'sing.wsgi.application'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],  # Enables custom login/register templates
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -57,12 +58,11 @@ TEMPLATES = [
     },
 ]
 
-# --- Database ---
+# --- Database (Neon.tech via DATABASE_URL) ---
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default=os.getenv('DATABASE_URL')
+    )
 }
 
 # --- Password Validation ---
@@ -74,8 +74,8 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 # --- Celery & Redis ---
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_BROKER_URL = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
+CELERY_RESULT_BACKEND = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 
