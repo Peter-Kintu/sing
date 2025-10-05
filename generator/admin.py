@@ -1,8 +1,6 @@
 from django.contrib import admin
 from django.db import models
 from django.db.models import QuerySet
-
-# Import your model and constants
 from .models import SongRequest, CULTURAL_THEMES
 
 @admin.action(description='Increment Remix Count by 1')
@@ -11,7 +9,7 @@ def increment_remix_count(modeladmin, request, queryset: QuerySet):
     updated_count = queryset.update(remix_count=models.F('remix_count') + 1)
     modeladmin.message_user(
         request,
-        f"Successfully incremented remix count for {updated_count} songs."
+        f"✅ Successfully incremented remix count for {updated_count} songs."
     )
 
 @admin.register(SongRequest)
@@ -32,13 +30,14 @@ class SongRequestAdmin(admin.ModelAdmin):
     list_display = [
         'id',
         'user',
-        'title',
+        'display_title',
         'genre',
         'mood',
         'language',
         'status',
         'remix_count',
         'is_public',
+        'is_remix',
         'created_at'
     ]
 
@@ -51,6 +50,15 @@ class SongRequestAdmin(admin.ModelAdmin):
         'is_public',
         'created_at'
     ]
+
+    # Searchable fields
+    search_fields = ['title', 'lyrics', 'user__username']
+
+    # Custom display for remix badge
+    def is_remix(self, obj):
+        return bool(obj.remix_of)
+    is_remix.boolean = True
+    is_remix.short_description = 'Remix?'
 
     # Ensure 'mood' is always included in filters
     def get_list_filter(self, request):

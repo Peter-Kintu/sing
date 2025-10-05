@@ -17,12 +17,12 @@
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h1 class="text-primary">🚀 Create Your Global Anthem</h1>
             {% if user.is_authenticated %}
-                <a href="{% url 'logout' %}" class="btn btn-outline-danger">🔓 Logout</a>
+                <a href="{% url 'logout' %}" class="btn btn-outline-danger" aria-label="Logout">🔓 Logout</a>
             {% endif %}
         </div>
 
         <!-- STAGE 1: INPUT FORM -->
-        <section id="input-form-stage">
+        <section id="input-form-stage" aria-label="Lyrics Input Form">
             <form id="lyrics-form">
                 {% csrf_token %}
 
@@ -91,15 +91,17 @@
         </section>
 
         <!-- STAGE 2: PROCESSING -->
-        <section id="processing-stage" class="text-center mt-5" style="display: none;">
-            <div class="progress" role="progressbar" style="height: 30px;">
+        <section id="processing-stage" class="text-center mt-5" style="display: none;" aria-label="Processing Stage">
+            <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" style="height: 30px;">
                 <div id="progress-bar" class="progress-bar progress-bar-striped progress-bar-animated" style="width: 0%;"></div>
             </div>
-            <p id="progress-message" class="mt-3 fw-bold fs-5 text-secondary">Writing the future of African music...</p>
+            <p id="progress-message" class="mt-3 fw-bold fs-5 text-secondary">
+                Generating your anthem... This may take a moment.
+            </p>
         </section>
 
         <!-- STAGE 3: RESULTS -->
-        <section id="result-stage" class="text-center mt-5" style="display: none;">
+        <section id="result-stage" class="text-center mt-5" style="display: none;" aria-label="Results Stage">
             <h2 id="result-heading" class="text-success mb-4">🎉 Your Anthem is Ready! 🎉</h2>
 
             <div id="remix-origin" class="mb-3 text-muted" style="display: none;">
@@ -119,7 +121,7 @@
             <div class="action-buttons d-grid gap-2 d-sm-flex justify-content-sm-center">
                 <a id="download-link" href="#" download class="btn btn-outline-success">Download Song</a>
                 <button id="remix-button" class="btn btn-warning" style="display: none;">♻️ Remix This Track</button>
-                <button id="share-button" class="btn btn-info">🌍 Share Globally</button>
+                <button id="share-button" class="btn btn-info" aria-label="Share your anthem globally">🌍 Share Globally</button>
             </div>
         </section>
     </div>

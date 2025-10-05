@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.urls import reverse
 
 # Get the custom User model (best practice)
 User = get_user_model()
@@ -93,8 +94,19 @@ class SongRequest(models.Model):
         return f"Song Request by {self.user.username} - {self.genre} ({self.status})"
 
     def save(self, *args, **kwargs):
-        # Auto-increment remix count on original song
-        if self.remix_of:
+        # Increment remix count only on creation
+        if self.pk is None and self.remix_of:
             self.remix_of.remix_count += 1
-            self.remix_of.save()
+            self.remix_of.save(update_fields=['remix_count'])
         super().save(*args, **kwargs)
+
+    @property
+    def is_remix(self):
+        return self.remix_of is not None
+
+    @property
+    def display_title(self):
+        return self.title or f"{self.genre.title()} Anthem by {self.user.username}"
+
+    def get_absolute_url(self):
+        return reverse('song-status', kwargs={'pk': self.pk})

@@ -1,5 +1,4 @@
 import requests
-from celery import shared_task
 from .models import SongRequest
 
 # --- External API Endpoints (Replace with actual keys and secure storage) ---
@@ -13,7 +12,6 @@ def call_makebestmusic(lyrics: str, genre: str, language: str = 'English'):
     """Simulate MakeBestMusic API to generate audio from lyrics."""
     try:
         print(f"🎶 Calling MakeBestMusic for genre={genre}, language={language}")
-        # Simulated payload — replace with real API if available
         response = requests.post(
             MAKEBESTMUSIC_API_URL,
             json={"lyrics": lyrics, "genre": genre, "language": language},
@@ -50,11 +48,10 @@ def call_kaiber_video(audio_url: str, lyrics: str, title: str = None):
         print(f"❌ Kaiber AI API call failed: {e}")
         return None
 
-# --- Celery Tasks ---
+# --- Synchronous Task Functions ---
 
-@shared_task
 def generate_audio_task(song_request_id: int, lyrics: str, genre: str):
-    """Generate audio and queue video generation."""
+    """Generate audio and trigger video generation."""
     print(f"🎶 Starting generate_audio_task for SongRequest ID {song_request_id}")
     try:
         song_request = SongRequest.objects.get(pk=song_request_id)
@@ -68,9 +65,9 @@ def generate_audio_task(song_request_id: int, lyrics: str, genre: str):
             song_request.save(update_fields=['audio_url', 'status', 'updated_at'])
             print(f"✅ Audio saved for SongRequest {song_request_id}")
 
-            generate_video_task.delay(song_request_id, audio_url, lyrics)
-            print(f"📦 Video task queued for SongRequest {song_request_id}")
-            return f"Audio generated for request {song_request_id}. Video task queued."
+            generate_video_task(song_request_id, audio_url, lyrics)
+            print(f"🎬 Video task executed for SongRequest {song_request_id}")
+            return f"Audio and video generated for request {song_request_id}."
 
         else:
             song_request.status = 'FAILED'
@@ -85,7 +82,6 @@ def generate_audio_task(song_request_id: int, lyrics: str, genre: str):
         print(f"🔥 Unexpected error in generate_audio_task: {e}")
         return f"Task failed with error: {e}"
 
-@shared_task
 def generate_video_task(song_request_id: int, audio_url: str, lyrics: str):
     """Generate video after audio is ready."""
     print(f"🎬 Starting generate_video_task for SongRequest ID {song_request_id}")

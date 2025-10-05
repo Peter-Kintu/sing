@@ -1,4 +1,4 @@
-// Base URL for API calls. Assuming the APIs are under the root URL path.
+// Base URL for API calls
 const BASE_API_URL = '/api';
 
 // DOM Elements
@@ -6,9 +6,9 @@ const form = document.getElementById('lyrics-form');
 const lyricsInput = document.getElementById('lyrics-input');
 const genreSelect = document.getElementById('genre-select');
 const moodSelect = document.getElementById('mood-select');
-const titleInput = document.getElementById('title-input'); // NEW
-const languageSelect = document.getElementById('language-select'); // NEW
-const publicCheckbox = document.getElementById('is-public-checkbox'); // NEW
+const titleInput = document.getElementById('title-input');
+const languageSelect = document.getElementById('language-select');
+const publicCheckbox = document.getElementById('is-public-checkbox');
 
 const generateButton = document.getElementById('generate-button');
 
@@ -21,7 +21,7 @@ const progressMessage = document.getElementById('progress-message');
 
 const audioPlayer = document.getElementById('audio-player');
 const videoPlayer = document.getElementById('video-player');
-const videoPlayerContainer = document.getElementById('video-player-container'); // NEW
+const videoPlayerContainer = document.getElementById('video-player-container');
 const downloadLink = document.getElementById('download-link');
 const remixButton = document.getElementById('remix-button');
 const currentStatusSpan = document.getElementById('current-status');
@@ -98,11 +98,10 @@ async function handleSubmit(e) {
 
 function startPolling(requestId) {
     const steps = [
-        { status: 'PENDING', progress: 10, message: 'Received request. Initializing Celery task...' },
-        { status: 'AUDIO_GENERATING', progress: 30, message: 'AI Composer is writing music (Music Hero API)...' },
-        { status: 'AUDIO_READY', progress: 60, message: 'Audio generated! Preparing to create visualizer...' },
-        { status: 'VIDEO_GENERATING', progress: 85, message: 'Visualizer is compiling (RevID AI API)...' },
+        { status: 'PENDING', progress: 10, message: 'Received request. Starting generation...' },
+        { status: 'AUDIO_READY', progress: 60, message: 'Audio generated! Preparing video...' },
         { status: 'VIDEO_READY', progress: 100, message: 'Complete! Your Global Anthem is ready!' },
+        { status: 'FAILED', progress: 100, message: 'Generation failed. Please try again.' }
     ];
 
     const pollStatus = async () => {

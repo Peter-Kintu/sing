@@ -68,14 +68,14 @@ class GenerateSongView(LoginRequiredMixin, generics.CreateAPIView):
         song_request = serializer.save(user=self.request.user, status='PENDING')
 
         try:
-            print(f"🎶 Dispatching audio task for SongRequest ID {song_request.id}")
-            generate_audio_task.delay(
+            print(f"🎶 Executing audio task for SongRequest ID {song_request.id}")
+            generate_audio_task(
                 song_request_id=song_request.id,
                 lyrics=song_request.lyrics,
                 genre=song_request.genre
             )
         except Exception as e:
-            print(f"❌ Failed to dispatch Celery task: {e}")
+            print(f"❌ Audio task execution failed: {e}")
             song_request.status = 'FAILED'
             song_request.save(update_fields=['status'])
 
@@ -133,14 +133,14 @@ class RemixSongView(LoginRequiredMixin, generics.CreateAPIView):
         )
 
         try:
-            print(f"♻️ Dispatching remix audio task for SongRequest ID {remix.id}")
-            generate_audio_task.delay(
+            print(f"♻️ Executing remix audio task for SongRequest ID {remix.id}")
+            generate_audio_task(
                 song_request_id=remix.id,
                 lyrics=remix.lyrics,
                 genre=remix.genre
             )
         except Exception as e:
-            print(f"❌ Remix task dispatch failed: {e}")
+            print(f"❌ Remix task execution failed: {e}")
             remix.status = 'FAILED'
             remix.save(update_fields=['status'])
 
