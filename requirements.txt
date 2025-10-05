@@ -1,0 +1,13 @@
+Django>=5.2,<6.0
+djangorestframework
+requests
+# For asynchronous task handling (required for .tasks file)
+celery
+redis # Or other Celery message broker like RabbitMQ
+# For media storage (S3/Firebase integration)
+django-storages
+boto3
+# For secure environment variable handling (highly recommended)
+django-environ
+# Optional: For future-proofing and video processing sync (Phase 3)
+ffmpeg-python

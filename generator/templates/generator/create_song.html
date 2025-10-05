@@ -1,0 +1,133 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KINTU: Lyrics to Global Song Creator</title>
+
+    <!-- Bootstrap CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <div id="app-container" class="container mt-5 p-4 bg-light rounded shadow">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h1 class="text-primary">🚀 Create Your Global Anthem</h1>
+            {% if user.is_authenticated %}
+                <a href="{% url 'logout' %}" class="btn btn-outline-danger">🔓 Logout</a>
+            {% endif %}
+        </div>
+
+        <!-- STAGE 1: INPUT FORM -->
+        <section id="input-form-stage">
+            <form id="lyrics-form">
+                {% csrf_token %}
+
+                <div class="mb-3">
+                    <label for="title-input" class="form-label fw-bold">1. Song Title (optional):</label>
+                    <input type="text" id="title-input" class="form-control" placeholder="Give your anthem a name...">
+                </div>
+
+                <div class="mb-3">
+                    <label for="lyrics-input" class="form-label fw-bold">2. Enter Your Lyrics:</label>
+                    <textarea id="lyrics-input" class="form-control" rows="6"
+                              placeholder="Enter your powerful, multilingual lyrics here..." required></textarea>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <label for="genre-select" class="form-label fw-bold">3. Select Genre:</label>
+                        <select id="genre-select" name="genre" class="form-select">
+                            <option value="afrobeats">Afrobeats</option>
+                            <option value="amapiano">Amapiano</option>
+                            <option value="highlife">Highlife</option>
+                            <option value="gengetone">Gengetone</option>
+                            <option value="pop">Global Pop</option>
+                            <option value="hiphop">Global Hip-Hop</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="mood-select" class="form-label fw-bold">4. Choose Cultural Theme:</label>
+                        <select id="mood-select" name="mood" class="form-select">
+                            <option value="celebratory">🎉 Celebration/Joy</option>
+                            <option value="resilience">💪 Resilience/Hope</option>
+                            <option value="love">❤️ Love/Affections</option>
+                            <option value="harvest">🌾 Harvest/Abundance</option>
+                            <option value="protest">✊ Protest/Activism</option>
+                            <option value="reflection">🧘 Reflection/Contemplation</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <label for="language-select" class="form-label fw-bold">5. Language:</label>
+                        <select id="language-select" name="language" class="form-select">
+                            <option value="English">English</option>
+                            <option value="Luganda">Luganda</option>
+                            <option value="Swahili">Swahili</option>
+                            <option value="Yoruba">Yoruba</option>
+                            <option value="French">French</option>
+                            <option value="Arabic">Arabic</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 d-flex align-items-end">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="is-public-checkbox" checked>
+                            <label class="form-check-label fw-bold" for="is-public-checkbox">
+                                Make this song public and remixable
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" id="generate-button" class="btn btn-success btn-lg">Generate Song & Video!</button>
+                </div>
+            </form>
+        </section>
+
+        <!-- STAGE 2: PROCESSING -->
+        <section id="processing-stage" class="text-center mt-5" style="display: none;">
+            <div class="progress" role="progressbar" style="height: 30px;">
+                <div id="progress-bar" class="progress-bar progress-bar-striped progress-bar-animated" style="width: 0%;"></div>
+            </div>
+            <p id="progress-message" class="mt-3 fw-bold fs-5 text-secondary">Writing the future of African music...</p>
+        </section>
+
+        <!-- STAGE 3: RESULTS -->
+        <section id="result-stage" class="text-center mt-5" style="display: none;">
+            <h2 id="result-heading" class="text-success mb-4">🎉 Your Anthem is Ready! 🎉</h2>
+
+            <div id="remix-origin" class="mb-3 text-muted" style="display: none;">
+                <small>♻️ Remix of: <span id="remix-source-title"></span></small>
+            </div>
+
+            <div id="audio-player-container" class="media-container mb-4">
+                <p class="fw-bold">Status: <span id="current-status" class="text-info">Audio Ready! Generating Video...</span></p>
+                <audio id="audio-player" controls class="w-100" style="display: none;"></audio>
+            </div>
+
+            <div id="video-player-container" class="media-container mb-4" style="display: none;">
+                <h3 class="text-primary">Watch Your Music Video! 🥳</h3>
+                <video id="video-player" controls class="w-100 border rounded" style="max-height: 400px;"></video>
+            </div>
+
+            <div class="action-buttons d-grid gap-2 d-sm-flex justify-content-sm-center">
+                <a id="download-link" href="#" download class="btn btn-outline-success">Download Song</a>
+                <button id="remix-button" class="btn btn-warning" style="display: none;">♻️ Remix This Track</button>
+                <button id="share-button" class="btn btn-info">🌍 Share Globally</button>
+            </div>
+        </section>
+    </div>
+
+    <!-- Bootstrap JS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Custom JavaScript -->
+    <script src="{% static 'js/main.js' %}"></script>
+</body>
+</html>

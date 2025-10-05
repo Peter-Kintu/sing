@@ -1,0 +1,86 @@
+/* 
+ * This file is a placeholder to stop the 404 console error 
+ * and can be used for custom styling outside of Bootstrap.
+ */
+
+body {
+    background-color: #f7f7f7;
+    font-family: 'Inter', sans-serif;
+}
+
+#app-container {
+    max-width: 800px;
+}
+
+/* Enhancing the generate button */
+#generate-button {
+    transition: all 0.2s ease;
+}
+
+#generate-button:hover {
+    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4);
+    transform: translateY(-1px);
+}
+
+/* Progress bar styling */
+#progress-bar {
+    background-color: #28a745;
+}
+
+/* Result heading success and failure states */
+#result-heading.text-success {
+    color: #28a745;
+}
+
+#result-heading.text-danger {
+    color: #dc3545;
+}
+
+/* Media containers */
+.media-container {
+    padding: 1rem;
+    background-color: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+}
+
+/* Audio and video players */
+#audio-player,
+#video-player {
+    margin-top: 1rem;
+}
+
+/* Action buttons */
+.action-buttons .btn {
+    min-width: 150px;
+    font-weight: bold;
+    transition: all 0.2s ease;
+}
+
+.action-buttons .btn:hover {
+    transform: scale(1.05);
+}
+
+/* Remix button */
+#remix-button {
+    background-color: #ffc107;
+    border-color: #ffc107;
+    color: #212529;
+}
+
+#remix-button:hover {
+    background-color: #ffca2c;
+    border-color: #ffca2c;
+}
+
+/* Share button */
+#share-button {
+    background-color: #17a2b8;
+    border-color: #17a2b8;
+    color: #fff;
+}
+
+#share-button:hover {
+    background-color: #138496;
+    border-color: #117a8b;
+}
