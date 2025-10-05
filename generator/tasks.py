@@ -2,28 +2,20 @@ import requests
 from .models import SongRequest
 
 # --- External API Endpoints (Replace with actual keys and secure storage) ---
-MAKEBESTMUSIC_API_URL = "https://makebestmusic.com/api/generate"  # Simulated endpoint
+DIFFRHYTHM_SIMULATED_AUDIO_URL = "https://example.com/dummy-diffrhythm-audio.mp3"  # Replace with real API when available
 KAIBER_VIDEO_API_URL = "https://kaiber.ai/api/video"  # Simulated endpoint
 # API_KEY_HEADER = {"Authorization": "Bearer YOUR_SECRET_KEY"}  # Use environment variables!
 
 # --- Utility Functions ---
 
-def call_makebestmusic(lyrics: str, genre: str, language: str = 'English'):
-    """Simulate MakeBestMusic API to generate audio from lyrics."""
+def call_diffrhythm_simulated(lyrics: str, genre: str, language: str = 'English'):
+    """Simulate DiffRhythm API to generate audio from lyrics."""
     try:
-        print(f"🎶 Calling MakeBestMusic for genre={genre}, language={language}")
-        response = requests.post(
-            MAKEBESTMUSIC_API_URL,
-            json={"lyrics": lyrics, "genre": genre, "language": language},
-            # headers=API_KEY_HEADER,
-            timeout=180
-        )
-        response.raise_for_status()
-        audio_url = response.json().get("audio_url")
-        print(f"✅ MakeBestMusic returned audio_url: {audio_url}")
-        return audio_url
-    except requests.RequestException as e:
-        print(f"❌ MakeBestMusic API call failed: {e}")
+        print(f"🎶 Simulating DiffRhythm for genre={genre}, language={language}")
+        # Replace this with a real API call when available
+        return DIFFRHYTHM_SIMULATED_AUDIO_URL
+    except Exception as e:
+        print(f"❌ DiffRhythm simulation failed: {e}")
         return None
 
 def call_kaiber_video(audio_url: str, lyrics: str, title: str = None):
@@ -57,7 +49,7 @@ def generate_audio_task(song_request_id: int, lyrics: str, genre: str):
         song_request = SongRequest.objects.get(pk=song_request_id)
         print(f"🔍 Found SongRequest: {song_request.title}")
 
-        audio_url = call_makebestmusic(lyrics, genre, song_request.language)
+        audio_url = call_diffrhythm_simulated(lyrics, genre, song_request.language)
 
         if audio_url:
             song_request.audio_url = audio_url
