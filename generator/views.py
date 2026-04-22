@@ -5,11 +5,100 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib import messages
+from django.core.cache import cache
+import requests as http_requests
+import os
 
 # Local imports
 from .models import SongRequest
 from .serializers import SongRequestSerializer
 from .tasks import generate_audio_task
+
+# ---------------------------------------------------------------------------
+# Translation helpers
+# ---------------------------------------------------------------------------
+
+# URL of the NLLB FastAPI microservice (set via env var on Render)
+NLLB_URL = os.getenv("NLLB_API_URL")          # e.g. https://africana-nllb-api.onrender.com/translate
+LIBRE_URL = "https://libretranslate.com/translate"
+
+# All African / Ugandan languages routed to the NLLB microservice.
+# Codes must match the keys in translator/main.py → LANGS dict.
+NLLB_LANGS = {
+    # Ugandan
+    'lg', 'nyn', 'ach', 'lgg', 'teo', 'xog', 'ttj', 'nyo', 'laj', 'alz',
+    # East Africa
+    'sw', 'luo', 'luy', 'kam', 'ki', 'rw', 'rn', 'so', 'om', 'am', 'ti',
+    # West Africa
+    'ha', 'yo', 'ig', 'fuv', 'bm', 'dyu', 'mos', 'wo', 'tw', 'ak', 'ee', 'fon', 'kbp',
+    # Central Africa
+    'ln', 'kg', 'lua', 'kmb', 'cjk', 'sg',
+    # Southern Africa
+    'zu', 'xh', 'st', 'nso', 'tn', 'ss', 've', 'nr', 'ny', 'sn', 'af',
+    # North Africa / Indian Ocean
+    'ary', 'mg',
+}
+
+
+def translate_smart(text: str, target_lang: str, source_lang: str = 'en') -> str:
+    """
+    Route translation requests:
+      - African languages (Luganda, Swahili, Zulu, etc.) → NLLB microservice
+      - Everything else → LibreTranslate
+      - Fallback on any error → return original text (browser auto-translate picks up)
+    Results are cached for 7 days to minimise API calls and latency.
+    """
+    if not text or target_lang == source_lang:
+        return text
+
+    cache_key = f"trans_{hash(text)}_{target_lang}"
+    cached = cache.get(cache_key)
+    if cached:
+        return cached
+
+    if target_lang in NLLB_LANGS and NLLB_URL:
+        # Route 1: NLLB microservice for African languages
+        try:
+            r = http_requests.post(
+                NLLB_URL,
+                json={"text": text[:500], "target": target_lang},
+                timeout=12,
+            )
+            if r.status_code == 200:
+                translated = r.json()["translated"]
+            else:
+                print(f"NLLB non-200 ({r.status_code}), falling back to LibreTranslate")
+                translated = _libre_call(text, target_lang, source_lang)
+        except Exception as e:
+            print(f"NLLB down: {e}, falling back to LibreTranslate")
+            translated = _libre_call(text, target_lang, source_lang)
+    else:
+        # Route 2: LibreTranslate for European / Asian languages
+        translated = _libre_call(text, target_lang, source_lang)
+
+    cache.set(cache_key, translated, 604800)  # 7 days
+    return translated
+
+
+def _libre_call(text: str, target_lang: str, source_lang: str = 'en') -> str:
+    """Call LibreTranslate; silently return original text on any failure."""
+    try:
+        res = http_requests.post(
+            LIBRE_URL,
+            json={
+                "q": text[:500],
+                "source": source_lang,
+                "target": target_lang,
+                "format": "text",
+            },
+            timeout=4,
+        )
+        if res.status_code == 200:
+            return res.json()["translatedText"]
+        print(f"LibreTranslate non-200: {res.status_code}")
+    except Exception as e:
+        print(f"LibreTranslate error: {e}")
+    return text
 
 # --- Auth Views ---
 

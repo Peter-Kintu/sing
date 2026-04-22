@@ -1,0 +1,7 @@
+fastapi==0.115.0
+uvicorn==0.30.6
+transformers==4.44.2
+sentencepiece==0.2.0
+# CPU-only build of PyTorch — smaller image, sufficient for inference
+torch==2.4.0 --index-url https://download.pytorch.org/whl/cpu
+pydantic==2.8.2
