@@ -117,6 +117,12 @@ class TranslateResponse(BaseModel):
 # ---------------------------------------------------------------------------
 # Endpoints
 # ---------------------------------------------------------------------------
+@app.get("/")
+def root():
+    """Root endpoint — Render pings this for health checks."""
+    return {"message": "NLLB API running", "docs": "/docs"}
+
+
 @app.get("/health")
 def health():
     return {"status": "ok", "model": _MODEL_NAME}
@@ -124,31 +130,34 @@ def health():
 
 @app.post("/translate", response_model=TranslateResponse)
 def translate(req: TranslateRequest):
+    # Empty / whitespace-only input — return early, no model call
+    if not req.text.strip():
+        return TranslateResponse(translated="", target=req.target)
+
     if req.target not in LANGS:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Unsupported target language '{req.target}'. Supported: {list(LANGS.keys())}",
-        )
+        raise HTTPException(400, f"Unsupported target '{req.target}'. Supported: {list(LANGS.keys())}")
     if req.source not in LANGS:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Unsupported source language '{req.source}'.",
+        raise HTTPException(400, f"Unsupported source '{req.source}'.")
+
+    try:
+        src_flores = LANGS[req.source]
+        tgt_flores = LANGS[req.target]
+
+        TOKENIZER.src_lang = src_flores
+        encoded = TOKENIZER(
+            req.text[:500],          # Hard limit prevents RAM spike
+            return_tensors="pt",
+            truncation=True,
+            max_length=256,
         )
-
-    src_flores = LANGS[req.source]
-    tgt_flores = LANGS[req.target]
-
-    TOKENIZER.src_lang = src_flores
-    encoded = TOKENIZER(
-        req.text[:500],
-        return_tensors="pt",
-        truncation=True,
-        max_length=256,
-    )
-    generated = MODEL.generate(
-        **encoded,
-        forced_bos_token_id=TOKENIZER.lang_code_to_id[tgt_flores],
-        max_length=256,
-    )
-    translated = TOKENIZER.batch_decode(generated, skip_special_tokens=True)[0]
-    return TranslateResponse(translated=translated, target=req.target)
+        generated = MODEL.generate(
+            **encoded,
+            forced_bos_token_id=TOKENIZER.lang_code_to_id[tgt_flores],
+            max_length=256,
+            num_beams=1,             # Greedy decode — ~30% less RAM, 2× faster
+        )
+        translated = TOKENIZER.batch_decode(generated, skip_special_tokens=True)[0]
+        return TranslateResponse(translated=translated, target=req.target)
+    except Exception as e:
+        print(f"Translation error: {e}")
+        raise HTTPException(500, "Translation failed")
