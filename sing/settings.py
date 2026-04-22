@@ -71,9 +71,11 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # --- Database ---
+# On Render: DATABASE_URL env var points to Postgres.
+# Locally: falls back to SQLite so runserver works without any env setup.
 DATABASES = {
     'default': dj_database_url.config(
-        default=os.getenv('DATABASE_URL')
+        default=os.getenv('DATABASE_URL', f"sqlite:///{BASE_DIR / 'db.sqlite3'}")
     )
 }
 

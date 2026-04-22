@@ -1,4 +1,4 @@
-#!C:\Users\DELL PC\Desktop\sing\venv\Scripts\python.exe
+#!C:\Users\NIIH\Desktop\sing\venv\Scripts\python.exe
 
 import sys
 import json
