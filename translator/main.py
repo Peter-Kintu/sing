@@ -26,6 +26,7 @@ print("Model loaded ✓")
 # ---------------------------------------------------------------------------
 # Language code map  (short code → NLLB Flores-200 code)
 # Keys use ISO 639-1 (2-letter) where it exists, ISO 639-3 (3-letter) otherwise.
+# Comprehensive coverage for African languages and UI options
 # ---------------------------------------------------------------------------
 LANGS: dict[str, str] = {
     # ── Source / pivot ───────────────────────────────────────────────────────
@@ -44,7 +45,7 @@ LANGS: dict[str, str] = {
     "alz": "alz_Latn",      # Alur           (Northwest – West Nile)
 
     # ── East Africa ──────────────────────────────────────────────────────────
-    "sw":  "swa_Latn",      # Swahili        (Tanzania, Kenya, Uganda, DRC)
+    "sw":  "swh_Latn",      # Swahili        (Tanzania, Kenya, Uganda, DRC)
     "luo": "luo_Latn",      # Luo / Dholuo   (Kenya, Tanzania)
     "luy": "luy_Latn",      # Luhya / Luyia  (Kenya)
     "kam": "kam_Latn",      # Kamba          (Kenya)
@@ -88,15 +89,24 @@ LANGS: dict[str, str] = {
     "ss":  "ssw_Latn",      # Swati / Swazi  (Eswatini, South Africa)
     "ve":  "ven_Latn",      # Tshivenda / Venda (South Africa)
     "nr":  "nbl_Latn",      # South Ndebele  (South Africa)
+    "ts":  "tso_Latn",      # Tsonga         (South Africa, Mozambique)
     "ny":  "nya_Latn",      # Chichewa / Nyanja (Malawi, Zambia, Mozambique)
     "sn":  "sna_Latn",      # Shona          (Zimbabwe)
     "af":  "afr_Latn",      # Afrikaans      (South Africa, Namibia)
 
     # ── North Africa ─────────────────────────────────────────────────────────
     "ary": "ary_Arab",      # Moroccan Darija (Morocco)
+    "ar":  "arb_Arab",      # Arabic (Standard)
 
     # ── Indian Ocean ─────────────────────────────────────────────────────────
     "mg":  "plt_Latn",      # Malagasy       (Madagascar)
+
+    # ── Additional Languages for UI Support ──────────────────────────────────
+    "fr":  "fra_Latn",      # French
+    "es":  "spa_Latn",      # Spanish
+    "de":  "deu_Latn",      # German
+    "zh":  "zho_Hans",      # Chinese (Simplified)
+    "ja":  "jpn_Jpan",      # Japanese
 }
 
 
