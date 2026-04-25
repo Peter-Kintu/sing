@@ -251,3 +251,30 @@ class RemixSongView(LoginRequiredMixin, generics.CreateAPIView):
             'original_title': original_song.title,
             'message': f'Remix of \"{original_song.title}\" started. You can check status shortly.'
         }, status=status.HTTP_201_CREATED)
+
+# --- Translate View ---
+
+def translate_view(request):
+    """
+    Handles translation requests via web form.
+    GET: Show translation form
+    POST: Translate text and display result
+    """
+    if request.method == 'POST':
+        text = request.POST.get('text', '').strip()
+        target_lang = request.POST.get('target_lang', 'en')
+        source_lang = request.POST.get('source_lang', 'en')
+
+        if text:
+            translated = translate_smart(text, target_lang, source_lang)
+        else:
+            translated = ''
+
+        return render(request, 'generator/translate.html', {
+            'text': text,
+            'translated': translated,
+            'target_lang': target_lang,
+            'source_lang': source_lang,
+        })
+
+    return render(request, 'generator/translate.html')

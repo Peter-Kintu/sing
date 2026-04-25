@@ -7,13 +7,15 @@ from .views import (
     public_gallery_view,
     login_view,
     register_view,
-    logout_view
+    logout_view,
+    translate_view
 )
 
 urlpatterns = [
     # --- Frontend Views ---
     path('', home_view, name='home'),  # Lyrics input and status page
     path('gallery/', public_gallery_view, name='public-gallery'),  # Public song showcase
+    path('translate/', translate_view, name='translate'),  # Translation tool
 
     # --- Auth Views ---
     path('login/', login_view, name='login'),
