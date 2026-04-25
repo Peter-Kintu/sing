@@ -42,11 +42,12 @@ NLLB_LANGS = {
 
 def translate_smart(text: str, target_lang: str, source_lang: str = 'en') -> str:
     """
-    Route translation requests:
-      - African languages (Luganda, Swahili, Zulu, etc.) → NLLB microservice
-      - Everything else → LibreTranslate
-      - Fallback on any error → return original text (browser auto-translate picks up)
-    Results are cached for 7 days to minimise API calls and latency.
+    Tiered Fallback Translation Architecture:
+      Tier 1: NLLB (African languages) - specialist for low-resource languages
+      Tier 2: LibreTranslate (Global languages) - fast, wide coverage
+      Tier 3: MyMemory (Fallback) - universal backup
+    
+    Results cached for 24h to minimize API calls and latency.
     """
     if not text or target_lang == source_lang:
         return text
@@ -54,35 +55,44 @@ def translate_smart(text: str, target_lang: str, source_lang: str = 'en') -> str
     cache_key = f"trans_{hash(text)}_{target_lang}"
     cached = cache.get(cache_key)
     if cached:
+        print(f"✓ Cache hit for {target_lang}")
         return cached
 
+    translated = None
+
+    # ═══════════════════════════════════════════════════════════════════════════
+    # TIER 1: NLLB Microservice (African Language Specialist)
+    # ═══════════════════════════════════════════════════════════════════════════
     if target_lang in NLLB_LANGS and NLLB_URL:
-        # Route 1: NLLB microservice for African languages
         try:
+            print(f"🔄 TIER 1: Attempting NLLB translation ({source_lang} → {target_lang})")
             r = http_requests.post(
                 NLLB_URL,
-                json={"text": text[:500], "target": target_lang},
-                timeout=12,
+                json={
+                    "text": text[:500],
+                    "target": target_lang,
+                    "source": source_lang  # Include source for better accuracy
+                },
+                timeout=15,  # Give NLLB extra time on slow servers
+                headers={"Content-Type": "application/json"}
             )
             if r.status_code == 200:
-                translated = r.json()["translated"]
+                translated = r.json().get("translated")
+                print(f"✓ NLLB success: {len(translated)} chars")
+                cache.set(cache_key, translated, 86400)  # Cache 24h
+                return translated
             else:
-                print(f"NLLB non-200 ({r.status_code}), falling back to LibreTranslate")
-                translated = _libre_call(text, target_lang, source_lang)
+                print(f"⚠ NLLB returned {r.status_code}: {r.text[:100]}")
+        except http_requests.Timeout:
+            print(f"⏱ NLLB timeout (cold start?), falling back...")
         except Exception as e:
-            print(f"NLLB down: {e}, falling back to LibreTranslate")
-            translated = _libre_call(text, target_lang, source_lang)
-    else:
-        # Route 2: LibreTranslate for European / Asian languages
-        translated = _libre_call(text, target_lang, source_lang)
+            print(f"❌ NLLB error: {e}")
 
-    cache.set(cache_key, translated, 604800)  # 7 days
-    return translated
-
-
-def _libre_call(text: str, target_lang: str, source_lang: str = 'en') -> str:
-    """Call LibreTranslate; silently return original text on any failure."""
+    # ═══════════════════════════════════════════════════════════════════════════
+    # TIER 2: LibreTranslate (Global Language Specialist)
+    # ═══════════════════════════════════════════════════════════════════════════
     try:
+        print(f"🔄 TIER 2: Attempting LibreTranslate ({source_lang} → {target_lang})")
         res = http_requests.post(
             LIBRE_URL,
             json={
@@ -91,14 +101,47 @@ def _libre_call(text: str, target_lang: str, source_lang: str = 'en') -> str:
                 "target": target_lang,
                 "format": "text",
             },
-            timeout=4,
+            timeout=6,
         )
         if res.status_code == 200:
-            return res.json()["translatedText"]
-        print(f"LibreTranslate non-200: {res.status_code}")
+            translated = res.json().get("translatedText")
+            print(f"✓ LibreTranslate success: {len(translated)} chars")
+            cache.set(cache_key, translated, 86400)
+            return translated
+        else:
+            print(f"⚠ LibreTranslate returned {res.status_code}")
+    except http_requests.Timeout:
+        print(f"⏱ LibreTranslate timeout")
     except Exception as e:
-        print(f"LibreTranslate error: {e}")
+        print(f"❌ LibreTranslate error: {e}")
+
+    # ═══════════════════════════════════════════════════════════════════════════
+    # TIER 3: MyMemory API (Universal Fallback)
+    # ═══════════════════════════════════════════════════════════════════════════
+    try:
+        print(f"🔄 TIER 3: Attempting MyMemory fallback ({source_lang} → {target_lang})")
+        mymemory_url = (
+            f"https://api.mymemory.translated.net/get?"
+            f"q={text[:500]}&langpair={source_lang}|{target_lang}"
+        )
+        res = http_requests.get(mymemory_url, timeout=5)
+        if res.status_code == 200:
+            data = res.json()
+            if data.get("responseStatus") == 200:
+                translated = data.get("responseData", {}).get("translatedText")
+                print(f"✓ MyMemory success: {len(translated)} chars")
+                cache.set(cache_key, translated, 86400)
+                return translated
+    except Exception as e:
+        print(f"❌ MyMemory error: {e}")
+
+    # ═══════════════════════════════════════════════════════════════════════════
+    # FALLBACK: Return original text (browser auto-translate as last resort)
+    # ═══════════════════════════════════════════════════════════════════════════
+    print(f"⚠ All translation services failed, returning original text")
+    cache.set(cache_key, text, 3600)  # Cache failure for 1h to avoid hammering
     return text
+
 
 # --- Auth Views ---
 
@@ -256,25 +299,47 @@ class RemixSongView(LoginRequiredMixin, generics.CreateAPIView):
 
 def translate_view(request):
     """
-    Handles translation requests via web form.
+    Handles translation requests via web form or AJAX JSON.
     GET: Show translation form
-    POST: Translate text and display result
+    POST (form): Translate text and render HTML response
+    POST (JSON): Return JSON response for AJAX clients
     """
     if request.method == 'POST':
-        text = request.POST.get('text', '').strip()
-        target_lang = request.POST.get('target_lang', 'en')
-        source_lang = request.POST.get('source_lang', 'en')
-
-        if text:
-            translated = translate_smart(text, target_lang, source_lang)
+        # Handle both form-encoded and JSON requests
+        if request.content_type == 'application/json':
+            import json
+            data = json.loads(request.body)
+            text = data.get('text', '').strip()
+            target_lang = data.get('target_lang', data.get('target', 'en'))
+            source_lang = data.get('source_lang', data.get('source', 'en'))
+            
+            if text:
+                translated = translate_smart(text, target_lang, source_lang)
+            else:
+                translated = ''
+            
+            return Response({
+                'text': text,
+                'translated': translated,
+                'target_lang': target_lang,
+                'source_lang': source_lang,
+            }, content_type='application/json')
         else:
-            translated = ''
+            # Form-encoded request
+            text = request.POST.get('text', '').strip()
+            target_lang = request.POST.get('target_lang', 'en')
+            source_lang = request.POST.get('source_lang', 'en')
 
-        return render(request, 'generator/translate.html', {
-            'text': text,
-            'translated': translated,
-            'target_lang': target_lang,
-            'source_lang': source_lang,
-        })
+            if text:
+                translated = translate_smart(text, target_lang, source_lang)
+            else:
+                translated = ''
+
+            return render(request, 'generator/translate.html', {
+                'text': text,
+                'translated': translated,
+                'target_lang': target_lang,
+                'source_lang': source_lang,
+            })
 
     return render(request, 'generator/translate.html')

@@ -26,7 +26,6 @@ print("Model loaded ✓")
 # ---------------------------------------------------------------------------
 # Language code map  (short code → NLLB Flores-200 code)
 # Keys use ISO 639-1 (2-letter) where it exists, ISO 639-3 (3-letter) otherwise.
-# Comprehensive coverage for African languages and UI options
 # ---------------------------------------------------------------------------
 LANGS: dict[str, str] = {
     # ── Source / pivot ───────────────────────────────────────────────────────
@@ -45,7 +44,7 @@ LANGS: dict[str, str] = {
     "alz": "alz_Latn",      # Alur           (Northwest – West Nile)
 
     # ── East Africa ──────────────────────────────────────────────────────────
-    "sw":  "swh_Latn",      # Swahili        (Tanzania, Kenya, Uganda, DRC)
+    "sw":  "swa_Latn",      # Swahili        (Tanzania, Kenya, Uganda, DRC)
     "luo": "luo_Latn",      # Luo / Dholuo   (Kenya, Tanzania)
     "luy": "luy_Latn",      # Luhya / Luyia  (Kenya)
     "kam": "kam_Latn",      # Kamba          (Kenya)
@@ -89,14 +88,12 @@ LANGS: dict[str, str] = {
     "ss":  "ssw_Latn",      # Swati / Swazi  (Eswatini, South Africa)
     "ve":  "ven_Latn",      # Tshivenda / Venda (South Africa)
     "nr":  "nbl_Latn",      # South Ndebele  (South Africa)
-    "ts":  "tso_Latn",      # Tsonga         (South Africa, Mozambique)
     "ny":  "nya_Latn",      # Chichewa / Nyanja (Malawi, Zambia, Mozambique)
     "sn":  "sna_Latn",      # Shona          (Zimbabwe)
     "af":  "afr_Latn",      # Afrikaans      (South Africa, Namibia)
 
     # ── North Africa ─────────────────────────────────────────────────────────
     "ary": "ary_Arab",      # Moroccan Darija (Morocco)
-    "ar":  "arb_Arab",      # Arabic (Standard)
 
     # ── Indian Ocean ─────────────────────────────────────────────────────────
     "mg":  "plt_Latn",      # Malagasy       (Madagascar)
@@ -105,8 +102,43 @@ LANGS: dict[str, str] = {
     "fr":  "fra_Latn",      # French
     "es":  "spa_Latn",      # Spanish
     "de":  "deu_Latn",      # German
+    "ar":  "arb_Arab",      # Arabic (Standard)
     "zh":  "zho_Hans",      # Chinese (Simplified)
     "ja":  "jpn_Jpan",      # Japanese
+
+    # ── Additional African Languages ─────────────────────────────────────────
+    "pcm": "pcm_Latn",      # Nigerian Pidgin (Nigeria)
+    "tzm": "tzm_Latn",      # Central Atlas Tamazight (Morocco)
+    "kab": "kab_Latn",      # Kabyle (Algeria)
+    "ber": "tzm_Latn",      # Berber (Morocco) - using Tamazight as proxy
+    "ff":  "fuv_Latn",      # Fulah (West Africa)
+    "kr":  "kri_Latn",      # Krio (Sierra Leone)
+    "nqo": "nqo_Nkoo",      # N'Ko (Mali, Guinea)
+    "vai": "vai_Vaii",      # Vai (Liberia, Sierra Leone)
+    "bci": "bci_Latn",      # Baoulé (Côte d'Ivoire)
+    "dag": "dag_Latn",      # Dagbani (Ghana)
+    "gaa": "gaa_Latn",      # Ga (Ghana)
+    "gur": "gur_Latn",      # Gurma (Burkina Faso)
+    "kpe": "kpe_Latn",      # Kpelle (Liberia)
+    "men": "men_Latn",      # Mende (Sierra Leone)
+    "sus": "sus_Latn",      # Susu (Guinea)
+    "tem": "tem_Latn",      # Temne (Sierra Leone)
+    "efi": "efi_Latn",      # Efik (Nigeria)
+    "ibb": "ibb_Latn",      # Ibibio (Nigeria)
+    "iso": "iso_Latn",      # Isoko (Nigeria)
+    "tiv": "tiv_Latn",      # Tiv (Nigeria)
+    "bin": "bin_Latn",      # Edo (Nigeria)
+    "ann": "ann_Latn",      # Obolo (Nigeria)
+    "gde": "gde_Latn",      # Gude (Nigeria, Cameroon)
+    "jbu": "jbu_Latn",      # Jukun (Nigeria)
+    "kcg": "kcg_Latn",      # Tyap (Nigeria)
+    "mcp": "mcp_Latn",      # Makaa (Cameroon)
+    "mfq": "mfq_Latn",      # Moba (Togo)
+    "nmg": "nmg_Latn",      # Kwasio (Cameroon)
+    "nnh": "nnh_Latn",      # Ngiemboon (Cameroon)
+    "pbi": "pbi_Latn",      # Parkwa (Nigeria)
+    "pil": "pil_Latn",      # Yom (Nigeria)
+    "sba": "sba_Latn",      # Ngambay (Chad)
 }
 
 
