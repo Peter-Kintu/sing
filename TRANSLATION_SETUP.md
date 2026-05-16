@@ -80,6 +80,8 @@ curl -X POST https://sing-nllb-translator.onrender.com/translate \
 # Expected: {"translated": "Wasuze", "target": "lg"}
 ```
 
+> Note: `/translate` is the NLLB translation endpoint. The Gemma prompt endpoint is separate and exposed at `/v1/chat` on the same microservice.
+
 #### Test the Django UI:
 - Go to `https://sing-sjf2.onrender.com/translate/`
 - Enter text, select English → Luganda

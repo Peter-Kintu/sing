@@ -148,8 +148,8 @@ LANGS: dict[str, str] = {
 # ---------------------------------------------------------------------------
 class TranslateRequest(BaseModel):
     text: str
+    source: str
     target: str
-    source: str = "en"
 
 
 class TranslateResponse(BaseModel):
