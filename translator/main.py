@@ -9,6 +9,7 @@ import os
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
+import requests
 
 app = FastAPI(title="NLLB Translation API")
 
@@ -157,6 +158,17 @@ class TranslateResponse(BaseModel):
 
 
 # ---------------------------------------------------------------------------
+# Gemma chat proxy schemas
+# ---------------------------------------------------------------------------
+class ChatRequest(BaseModel):
+    prompt: str
+
+
+class ChatResponse(BaseModel):
+    generated_text: str
+
+
+# ---------------------------------------------------------------------------
 # Endpoints
 # ---------------------------------------------------------------------------
 @app.get("/")
@@ -203,3 +215,56 @@ def translate(req: TranslateRequest):
     except Exception as e:
         print(f"Translation error: {e}")
         raise HTTPException(500, "Translation failed")
+
+
+# ---------------------------------------------------------------------------
+# Gemma LLM proxy endpoint (hosted via Hugging Face Inference API)
+# ---------------------------------------------------------------------------
+HF_TOKEN = os.getenv("HF_TOKEN", "YOUR_HUGGING_FACE_TOKEN_HERE")
+GEMMA_API_URL = "https://api-inference.huggingface.co/models/google/gemma-2b-it"
+
+
+@app.post("/v1/chat", response_model=ChatResponse)
+def chat_with_gemma(req: ChatRequest):
+    """
+    Proxy prompt to the hosted Gemma model via the Hugging Face Inference API.
+    """
+    if not req.prompt.strip():
+        raise HTTPException(400, "Prompt cannot be empty.")
+
+    headers = {
+        "Authorization": f"Bearer {HF_TOKEN}",
+        "Content-Type": "application/json",
+    }
+
+    payload = {
+        "inputs": req.prompt,
+        "parameters": {
+            "max_new_tokens": 200,
+            "temperature": 0.3,
+            "return_full_text": False,
+        },
+    }
+
+    try:
+        response = requests.post(GEMMA_API_URL, headers=headers, json=payload, timeout=25)
+
+        if response.status_code == 503:
+            return ChatResponse(generated_text="Gemma engine initializing in cloud workspace. Try again in moments.")
+
+        if response.status_code != 200:
+            raise HTTPException(response.status_code, f"Gemma API Server returned an unexpected layout state: {response.text}")
+
+        res_data = response.json()
+
+        if isinstance(res_data, list) and len(res_data) > 0:
+            ai_reply = res_data[0].get("generated_text", "No response returned.")
+        elif isinstance(res_data, dict):
+            ai_reply = res_data.get("generated_text", "No response returned.")
+        else:
+            ai_reply = str(res_data)
+
+        return ChatResponse(generated_text=ai_reply.strip())
+
+    except requests.exceptions.RequestException as e:
+        raise HTTPException(500, f"Failed connection logic with cloud endpoint node: {str(e)}")

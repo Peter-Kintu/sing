@@ -5,3 +5,4 @@ sentencepiece==0.2.0
 # CPU-only build of PyTorch — smaller image, sufficient for inference
 torch==2.4.0 --index-url https://download.pytorch.org/whl/cpu
 pydantic==2.8.2
+requests==2.31.0
